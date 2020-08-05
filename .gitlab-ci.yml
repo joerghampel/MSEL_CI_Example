@@ -1,0 +1,73 @@
+# predefined environment variables (see https://docs.gitlab.com/ee/ci/variables/README.html)
+variables: 
+    #     CI_PROJECT_DIR				The full path where the repository is cloned and where the job is run.
+    #     CI_PROJECT_ID					The unique id of the current project that GitLab CI uses internally
+    #     CI_PROJECT_NAME				The project name that is currently being built (actually it is project folder name)
+    #     CI_PROJECT_NAMESPACE			The project namespace (username or groupname) that is currently being built
+    #     CI_PROJECT_PATH				The namespace with project name
+    #     CI_PROJECT_PATH_SLUG			$CI_PROJECT_PATH lowercased and with everything except 0-9 and a-z replaced with -. Use in URLs and domain names.
+    #     GITLAB_USER_EMAIL				The email of the user who started the job
+
+
+# ################################################################################
+# STAGES  
+# ################################################################################
+stages:
+  - analyze
+  - test
+  - build
+
+# ################################################################################
+# JOBS
+# ################################################################################
+
+VIAnalyzer:
+    stage: analyze
+    script:
+      # Run VIAnalyzer
+      - g-cli --timeout 30000 -v --lv-ver 2020 "C:\CI-Tools\execute_analysis.vi" -- "$CI_PROJECT_DIR" "test\VI Analyzer Config.viancfg"
+    rules:
+        allow_failure: false
+        when: always
+    artifacts:
+      name: "$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
+      paths:
+        - artifacts/analysis
+      expire_in: 1 week
+    tags:
+      - "2020"
+      - "labview"
+
+Caraya:
+    stage: test
+    script:
+      # Run unit tests
+      - g-cli --timeout 30000 -v --lv-ver 2020 "C:\CI-Tools\execute_unittests.vi" -- "$CI_PROJECT_DIR" "test\test subVI - Caraya.vi"
+    rules:
+        allow_failure: false
+        when: always
+    artifacts:
+      name: "$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
+      paths:
+        - artifacts/unittests
+      reports:
+        junit: artifacts/unittests/results.xml
+      expire_in: 1 week
+    tags:
+      - "2020"
+      - "labview"
+
+BuildSpec:
+    stage: build
+    script:
+      # Execute buildspec
+      - g-cli --timeout 30000 -v --lv-ver 2020 lvBuild -- -versionNumber "$CI_COMMIT_TAG" "CI Example.lvproj" "CI Example Exe" 
+    rules:
+      # run only if a tag by the format of "v1.2.3" was pushed
+      - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\..+$/'
+        allow_failure: false
+        when: on_success
+    tags:
+        - "2020"
+        - "labview"
+
