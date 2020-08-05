@@ -17,6 +17,18 @@ stages:
   - test
   - build
 
+
+
+# ################################################################################
+# WORKFLOW
+# ################################################################################
+workflow:
+    rules:
+      # run only if a tag by the format of "v1.2.3" was pushed
+      - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\..+$/'
+
+
+
 # ################################################################################
 # JOBS
 # ################################################################################
@@ -56,11 +68,6 @@ BuildSpec:
     script:
       # Execute buildspec
       - g-cli --timeout 30000 -v --lv-ver 2020 lvBuild -- "$CI_PROJECT_DIR\CI Example.lvproj" "CI Example EXE" 
-    rules:
-      # run only if a tag by the format of "v1.2.3" was pushed
-      - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\..+$/'
-        allow_failure: false
-        when: on_success
     artifacts:
       name: "$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
       paths:
