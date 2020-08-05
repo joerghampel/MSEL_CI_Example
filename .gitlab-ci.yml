@@ -26,9 +26,6 @@ VIAnalyzer:
     script:
       # Run VIAnalyzer
       - g-cli --timeout 30000 -v --lv-ver 2020 "C:\CI-Tools\execute_analysis.vi" -- "$CI_PROJECT_DIR" "test\VI Analyzer Config.viancfg"
-    rules:
-      - if: '$CI_COMMIT_TAG == ""'
-        when: always
     artifacts:
       name: "$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
       paths:
@@ -43,9 +40,6 @@ Caraya:
     script:
       # Run unit tests
       - g-cli --timeout 30000 -v --lv-ver 2020 "C:\CI-Tools\execute_unittests.vi" -- "$CI_PROJECT_DIR" "test\test subVI - Caraya.vi"
-    rules:
-      - if: '$CI_COMMIT_TAG == ""'
-        when: always
     artifacts:
       name: "$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
       paths:
