@@ -43,10 +43,6 @@ Caraya:
       # Run unit tests
       - g-cli --timeout 30000 -v --lv-ver 2020 "C:\CI-Tools\execute_unittests.vi" -- "$CI_PROJECT_DIR" "test\test subVI - Caraya.vi"
     rules:
-<<<<<<< HEAD
-=======
-        allow_failure: false
->>>>>>> e30384c0ecb83f59c6df0d095886a1e9f873190d
         - when: always
     artifacts:
       name: "$CI_JOB_STAGE-$CI_COMMIT_REF_NAME"
